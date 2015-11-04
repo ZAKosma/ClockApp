@@ -1,76 +1,67 @@
-function CountDownTimer(duration, granularity) {
+//Player One's set time
+var oneSeconds = 150;
+//Player Two's set time
+var twoSeconds = 150;
+//Bool which stores which clock is active
+var oneIsActive;
+
+function Timer(duration, granularity){
+  //Used to track which clock to pause/start
+  var timerId = null;
+  //Duration in seconds
   this.duration = duration;
+  //How often the clock is refreshed in miliseconds. (Defaults to 1000 miliseconds)
   this.granularity = granularity || 1000;
+  //Functions that get called on tick
   this.tickFtns = [];
+  //Similar to oneIsActive tells if the clock is running
   this.running = false;
 }
 
-CountDownTimer.prototype.start = function() {
-  if (this.running) {
-    return;
-  }
-  this.running = true;
-  var start = Date.now(),
-      that = this,
-      diff, obj;
+//Start's the clock
+Timer.prototype.clockStart = function() {
+  if (this.timerId) return;
+  timerId = setInterval(this.update(), 1000);
+  var start = Date.now();
+  this.update();
+};
+//Pause's the clock
+Timer.prototype.clockStop = function() {
+  clearInterval(timerId);
+  timerId = null;
+};
+//Updates the time on the clock
+Timer.prototype.update = function() {
+  if(this.running){
+    duration = duration - ((start - Date.now()) / 1000);
 
-  (function timer() {
-    diff = that.duration - (((Date.now() - start) / 1000) | 0);
-
-    if (diff > 0) {
-      setTimeout(timer, that.granularity);
-    } else {
-      diff = 0;
-      that.running = false;
-    }
-
-    obj = CountDownTimer.parse(diff);
     that.tickFtns.forEach(function(ftn) {
       ftn.call(this, obj.minutes, obj.seconds);
     }, that);
-  }());
+  }
 };
-
-CountDownTimer.prototype.unpause = function(){
-  this.running = true;
-};
-CountDownTimer.prototype.pause = function(){
-  clearInterval(timerId)
-  timerId = null
-
-};
-
-CountDownTimer.prototype.onTick = function(ftn) {
-  if (typeof ftn === 'function') {
+Timer.prototype.onTick = function(ftn){
+  if(typeof ftn === 'function'){
     this.tickFtns.push(ftn);
   }
   return this;
 };
-
-CountDownTimer.prototype.expired = function() {
-  return !this.running;
-};
-
-CountDownTimer.parse = function(seconds) {
+Timer.parse = function(seconds) {
   return {
     'minutes': (seconds / 60) | 0,
     'seconds': (seconds % 60) | 0
   };
 };
 
-var oneSeconds = 150;
-var twoSeconds = 150;
-var oneIsActive;
-
 var main = function(){
 
   var displayOne = document.querySelector('#btntwo > p'),
-      timerOne = new CountDownTimer(twoSeconds),
-      timeObjOne = CountDownTimer.parse(twoSeconds);
+      timerOne = new Timer(oneSeconds),
+      timeObjOne = Timer.parse(timerOne.duration);
 
   var displayTwo = document.querySelector('#btnone > p'),
-      timerTwo = new CountDownTimer(oneSeconds),
-      timeObjTwo = CountDownTimer.parse(oneSeconds);
+      timerTwo = new Timer(twoSeconds),
+      timeObjTwo = Timer.parse(timerTwo.duration);
 
   format(timeObjOne.minutes, timeObjOne.seconds);
   format(timeObjTwo.minutes, timeObjTwo.seconds);
@@ -88,41 +79,12 @@ var main = function(){
     }
 
   $("#btnone").click( function() {
-    if(timerOne.running !== true){
-      timerOne.start();
-      timerTwo.running = false;
-    }
+    timerOne.clockStart();
   });
   $("#btntwo").click( function() {
     /*$("#btntwo > p").text(displayClock(seconds));*/
-    if(timerTwo.running !== true){
-      timerTwo.start();
-      timerOne.running = false;
-    }
+      timerTwo.clockStart();
   });
 };
-
-function Timer(duration, granularity){
-  var timerId;// current timer if started
-  this.duration = duration;
-  this.granularity = granularity || 1000;
-  this.running = false;
-}
-Timer.prototype.clockStart = function() {
-  if (timerId) return;
-  timerId = setInterval(update, 1000);
-  var start = Date.now();
-  update();
-};
-Timer.prototype.clockStop = function() {
-  clearInterval(timerId);
-  timerId = null;
-};
-Timer.prototype.update = function() {
-  if(this.running){
-    diff = that.duration - (((Date.now() - start) / 1000) | 0);
-  }
-};
-
 
 $(document).ready(main);

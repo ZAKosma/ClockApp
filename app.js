@@ -1,7 +1,7 @@
 //Player One's set time
-var oneSeconds = 150;
+var oneSeconds = 30;
 //Player Two's set time
-var twoSeconds = 150;
+var twoSeconds = 10;
 //Bool which stores which clock is active
 var oneIsActive;
 
@@ -10,6 +10,9 @@ function CountDownTimer(duration, granularity) {
   this.granularity = granularity || 1000;
   this.tickFtns = [];
   this.running = false;
+  this.isPaused = true;
+  this.startTime = Date.now();
+  this.pauseTime = Date.now();
 }
 
 CountDownTimer.prototype.start = function() {
@@ -17,14 +20,21 @@ CountDownTimer.prototype.start = function() {
     return;
   }
   this.running = true;
-  var start = Date.now(),
-      that = this,
+  this.isPaused = false;
+  //this.pauseTime = false;
+  this.startTime = Date.now();
+  var that = this,
       diff, obj;
 
   (function timer() {
-    diff = that.duration - (((Date.now() - start) / 1000) | 0);
-
-    if (diff > 0) {
+    console.log("Start Time: " + that.startTime);
+    console.log("Time: " + Date.now());
+    if(that.isPaused){
+      setTimeout(timer, that.granularity);
+      return;
+    }
+    diff = that.duration -  (((Date.now() - that.startTime) / 1000) | 0);
+    if (diff > 0){
       setTimeout(timer, that.granularity);
     } else {
       diff = 0;
@@ -39,12 +49,22 @@ CountDownTimer.prototype.start = function() {
 };
 
 CountDownTimer.prototype.unpause = function(){
-  this.running = true;
+  this.isPaused = false;
+  this.startTime += Date.now() - this.pauseTime;
 };
 CountDownTimer.prototype.pause = function(){
-  clearInterval(timerId)
-  timerId = null
-
+  //clearInterval(timerId);
+  this.isPaused = true;
+  this.pauseTime = Date.now();
+};
+CountDownTimer.prototype.togglePause = function(){
+  //clearInterval(timerId);
+  if(this.isPaused){
+    this.unpause();
+  }
+  else {
+    this.pause();
+  }
 };
 
 CountDownTimer.prototype.onTick = function(ftn) {
@@ -69,11 +89,11 @@ CountDownTimer.parse = function(seconds) {
 var main = function(){
 
   var displayOne = document.querySelector('#btntwo > p'),
-      timerOne = new CountDownTimer(oneSeconds),
+      timerOne = new CountDownTimer(twoSeconds),
       timeObjOne = CountDownTimer.parse(timerOne.duration);
 
   var displayTwo = document.querySelector('#btnone > p'),
-      timerTwo = new CountDownTimer(twoSeconds),
+      timerTwo = new CountDownTimer(oneSeconds),
       timeObjTwo = CountDownTimer.parse(timerTwo.duration);
 
   format(timeObjOne.minutes, timeObjOne.seconds);
@@ -97,6 +117,9 @@ var main = function(){
   $("#btntwo").click( function() {
     /*$("#btntwo > p").text(displayClock(seconds));*/
       timerTwo.start();
+  });
+  $("#pause").click( function(){
+    timerOne.togglePause();
   });
 };
 

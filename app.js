@@ -144,7 +144,7 @@ var main = function(){
   $("#btntwo").click( function() {
     console.log("btntwo: Pressed");
     if(timerOne.isPaused === true && timerTwo.isPaused === false){
-      console.log("btntwo: Ran")
+      console.log("btntwo: Ran");
       timerOne.togglePause();
       timerTwo.togglePause();
 

@@ -1,6 +1,6 @@
 * {
     box-sizing: border-box;
-    border: 1px solid black;
+    border: 1px solid red;
 }
 
 body {
@@ -36,19 +36,20 @@ body {
 
 .center p {
   font-size: 5vh;
+  color: #DDDDDD;
   padding: 2vh;
 }
 
-#btnone {
-  background-color: #5075FA;
-
-    filter:  progid:DXImageTransform.Microsoft.BasicImage(rotation=2);  /* IE6,IE7 */
+#btntwo {
+  background-color: #FA7550;
+  /*The following flips the second btn contents*/
+  filter:  progid:DXImageTransform.Microsoft.BasicImage(rotation=2);  /* IE6,IE7 */
   ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)"; /* IE8 */
   -moz-transform: rotate(-180deg);  /* FF3.5+ */
   -o-transform: rotate(-180deg);  /* Opera 10.5 */
   -webkit-transform: rotate(-180deg);  /* Safari 3.1+, Chrome */
 }
 
-#btntwo {
-  background-color: #FA7550;
+#btnone {
+  background-color: #5075FA;
 }
